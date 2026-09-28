@@ -1,0 +1,134 @@
+# ============================================================
+# GeoAI-UrbanTree-RFDETR
+# Root .gitignore
+# ============================================================
+
+
+# ============================================================
+# Python generated files
+# ============================================================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+
+# ============================================================
+# Jupyter
+# ============================================================
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+
+# ============================================================
+# Python environments
+# ============================================================
+.venv/
+venv/
+env/
+ENV/
+conda-env/
+
+
+# ============================================================
+# IDE / editor files
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+
+# ============================================================
+# Operating system files
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ============================================================
+# Raw GeoTIFF imagery
+# Keep locally / distribute externally through Zenodo
+# ============================================================
+datasets/geotiff_rgbn/**/*.tif
+datasets/geotiff_rgbn/**/*.tiff
+
+
+# ============================================================
+# Original vector labels
+# Keep locally / distribute externally through Zenodo
+# ============================================================
+datasets/labels/**/*.shp
+datasets/labels/**/*.shx
+datasets/labels/**/*.dbf
+datasets/labels/**/*.prj
+datasets/labels/**/*.cpg
+datasets/labels/**/*.sbn
+datasets/labels/**/*.sbx
+datasets/labels/**/*.xml
+datasets/labels/**/*.gpkg
+
+
+# ============================================================
+# COCO dataset images
+#
+# Keep COCO annotation JSON files trackable for now.
+# Ignore only image data.
+# ============================================================
+datasets/coco/**/images/*
+datasets/coco/**/images/**/*
+
+
+# ============================================================
+# Model weights / checkpoints
+#
+# Trained weights will be distributed externally if needed.
+# ============================================================
+weights/**/*.pth
+weights/**/*.pt
+weights/**/*.ckpt
+
+*.pth
+*.pt
+*.ckpt
+
+
+# ============================================================
+# Generated outputs
+#
+# Training, CV, evaluation, and full-AOI inference products
+# are generated locally and should not be committed.
+# ============================================================
+outputs/**
+
+
+# ============================================================
+# Training logs
+# ============================================================
+runs/
+logs/
+wandb/
+tensorboard/
+lightning_logs/
+
+
+# ============================================================
+# Temporary files
+# ============================================================
+*.tmp
+*.temp
+*.bak
+*.log

@@ -1,0 +1,36 @@
+project:
+  name: GeoAI-UrbanTree-RFDETR
+  experiment_name: cv_baseline
+
+dataset:
+  type: cross_validation
+  root: datasets/coco/cv
+  annotation_file: _annotations.coco.json
+
+  fold_prefix: fold_
+  num_folds: 5
+
+  splits:
+    train: train
+    valid: valid
+
+model:
+  architecture: RFDETRBase
+  pretrained: true
+
+training:
+  epochs: 50
+  batch_size: 8
+  grad_accum_steps: 4
+  learning_rate: 0.0001
+  num_workers: 8
+  checkpoint_interval: 10
+  run_test_during_training: false
+
+output:
+  root: outputs/cross_validation
+  fold_prefix: fold_
+
+system:
+  device: cuda
+  seed: 42

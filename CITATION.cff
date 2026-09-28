@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+
+message: "If you use this software in your research, please cite it using the metadata in this file."
+
+title: "GeoAI-UrbanTree-RFDETR"
+
+type: software
+
+authors:
+  - family-names: "Liao"
+    given-names: "Hao-Yu"
+
+abstract: >
+  Reproducible RF-DETR pipeline for urban tree detection from
+  high-resolution geospatial imagery, supporting GeoTIFF and vector-label
+  preparation to COCO format, train/validation/test experiments,
+  cross-validation, transfer evaluation, and large-area geospatial inference.
+
+keywords:
+  - GeoAI
+  - urban trees
+  - RF-DETR
+  - object detection
+  - remote sensing
+  - geospatial artificial intelligence
+  - NAIP
+  - cross-validation
+  - transfer learning
+  - geospatial inference
+
+repository-code: "https://github.com/GeoAI-Earth-eXplore/GeoAI-UrbanTree-RFDETR"
+
+license: MIT
+
+version: "1.0.0"
+
+date-released: 2026-09-28

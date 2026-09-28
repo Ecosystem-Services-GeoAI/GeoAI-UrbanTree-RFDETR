@@ -1,0 +1,65 @@
+project:
+  name: GeoAI-UrbanTree-RFDETR
+
+model:
+  architecture: RFDETRBase
+
+checkpoint:
+  # TVT checkpoint
+  tvt: weights/tvt/checkpoint_best_ema.pth
+
+  # CV checkpoints
+  cv_root: weights/cv
+  cv_pattern: fold_{fold}/checkpoint_best_ema.pth
+
+evaluation:
+  # Low threshold used for COCO AP / AR evaluation
+  coco_threshold: 0.001
+
+  # Practical threshold used for F1 and visualizations
+  prediction_threshold: 0.30
+
+  iou_threshold: 0.50
+  max_detections: 200
+
+  save_predictions: true
+  save_visualizations: true
+
+visualization:
+  ground_truth_color: lime
+  prediction_color: red
+  box_width: 2
+  panel_gap: 20
+
+datasets:
+  tvt:
+    root: datasets/coco/tvt
+    splits:
+      - train
+      - valid
+      - test
+
+  cv:
+    root: datasets/coco/cv
+    num_folds: 5
+    splits:
+      - train
+      - valid
+
+  transfer:
+    root: datasets/coco/transfer
+
+    cities:
+      - new_york_030
+      - chicago_030
+      - dallas_060
+      - los_angeles_060
+
+    split: test
+
+output:
+  root: outputs/evaluation
+
+  tvt: outputs/evaluation/tvt
+  cv: outputs/evaluation/cv
+  transfer: outputs/evaluation/transfer

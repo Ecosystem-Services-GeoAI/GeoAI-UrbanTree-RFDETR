@@ -1,0 +1,36 @@
+project:
+  name: GeoAI-UrbanTree-RFDETR
+  experiment_name: tvt_baseline
+
+dataset:
+  type: tvt
+  root: datasets/coco/tvt
+  annotation_file: _annotations.coco.json
+
+  splits:
+    train: train
+    valid: valid
+    test: test
+
+model:
+  architecture: RFDETRBase
+  pretrained: true
+
+training:
+  epochs: 50
+  batch_size: 8
+  grad_accum_steps: 4
+  learning_rate: 0.0001
+  num_workers: 8
+  checkpoint_interval: 10
+
+  # Testing is handled separately by evaluate.py
+  run_test_during_training: false
+
+output:
+  root: outputs/training/tvt
+  run_name: rfdetr_tvt_base
+
+system:
+  device: cuda
+  seed: 42
