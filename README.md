@@ -5,9 +5,6 @@ Reproducible RF-DETR pipeline for urban tree detection from high-resolution geos
 This repository supports the complete workflow from geospatial data preparation to model training, cross-validation, evaluation, transfer testing, and large-area GeoTIFF inference. It can be used either to reproduce the urban-tree experiments in this project or to train and evaluate RF-DETR on a user's own compatible dataset.
 
 ---
-
----
-
 ## Categories
 
 - [Quick Start](#quick-start)
@@ -53,9 +50,6 @@ Main capabilities include:
 - reusable Python modules under `src/geoai_tree/`
 
 ---
-
----
-
 ## Quick Start
 
 ### 1. Create the environment
@@ -116,9 +110,6 @@ PYTHONPATH=src python scripts/infer_geotiff.py \
 ```
 
 ---
-
----
-
 ## Installation
 
 The repository was tested with:
@@ -156,9 +147,6 @@ PYTHONPATH=src
 ```
 
 ---
-
----
-
 ## Supported Workflows
 
 ```text
@@ -192,9 +180,6 @@ GeoTIFF imagery + vector tree labels
 ```
 
 ---
-
----
-
 ## Dataset Types
 
 The repository uses several dataset organizations depending on the task.
@@ -347,9 +332,6 @@ PYTHONPATH=src python scripts/evaluate.py \
 ```
 
 ---
-
----
-
 ## Repository Structure
 
 ```text
@@ -396,9 +378,6 @@ GeoAI-UrbanTree-RFDETR/
 ```
 
 ---
-
----
-
 ## Commands
 
 ### Dataset preparation
@@ -474,17 +453,11 @@ PYTHONPATH=src python scripts/infer_geotiff.py \
 ```
 
 ---
-
----
-
 ## Configuration Files
 
 All major workflows are controlled through YAML files so that dataset paths, training settings, evaluation thresholds, and output locations can be changed without editing the Python source code.
 
 ---
-
----
-
 ## Using Your Own Dataset
 
 There are two main ways to use your own data.
@@ -555,9 +528,6 @@ PYTHONPATH=src python scripts/train.py \
 The shared trainer validates the required directory structure before training starts.
 
 ---
-
----
-
 ## Model Weights
 
 Released model weights use the EMA checkpoint:
@@ -588,9 +558,6 @@ weights/
 Large model weights are not stored directly in the Git repository and can be distributed separately through Zenodo.
 
 ---
-
----
-
 ## Outputs
 
 ### Training
@@ -644,9 +611,6 @@ summary.json
 ```
 
 ---
-
----
-
 ## Python Package
 
 Reusable functionality is implemented under:
@@ -746,9 +710,6 @@ Responsibilities:
 - model-checkpoint resolution
 
 ---
-
----
-
 ## Citation
 
 If you use this repository in research, please cite the associated publication and software release.
@@ -762,9 +723,6 @@ CITATION.cff
 The Zenodo DOI for archived software, datasets, and model weights can be added after the public archive is created.
 
 ---
-
----
-
 ## License
 
 This project is released under the MIT License.
