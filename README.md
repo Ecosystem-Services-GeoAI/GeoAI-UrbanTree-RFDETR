@@ -7,17 +7,17 @@ This repository supports the complete workflow from geospatial data preparation 
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![RF-DETR](https://img.shields.io/badge/RF--DETR-1.5.0rc1-purple)](https://github.com/roboflow/rf-detr)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.10-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-Powered%20By-4285F4?logo=googleearth&logoColor=white)](https://earthengine.google.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Online System](https://img.shields.io/badge/Online%20System-Miami%20Tree%20Canopy%20Explorer-brightgreen)](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)
-[![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-Powered%20By-4285F4?logo=googleearth&logoColor=white)](https://earthengine.google.com/)
 
 <!--
 [![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Model-yellow)](YOUR_HUGGINGFACE_URL)
 [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 [![Preprint](https://img.shields.io/badge/Preprint-EcoEvoRxiv-darkgreen)](YOUR_PREPRINT_URL)
 -->
-
 ---
+
 ## Categories
 
 - [Overview](#overview)
@@ -42,6 +42,7 @@ This repository supports the complete workflow from geospatial data preparation 
 - [License](#license)
 
 ---
+
 ## Overview
 
 The pipeline is designed around high-resolution geospatial imagery and object-detection labels for individual trees.
@@ -86,6 +87,7 @@ The application connects the model inference outputs with an interactive Google 
 > **Note:** The online system demonstrates the Miami tree-detection results generated from the project workflow. The reproducible training, evaluation, and large-area inference pipeline is provided in this repository.
 
 ---
+
 ## Quick Start
 
 ### 1. Create the environment
@@ -146,6 +148,7 @@ PYTHONPATH=src python scripts/infer_geotiff.py \
 ```
 
 ---
+
 ## Installation
 
 The repository was tested with:
@@ -216,6 +219,7 @@ GeoTIFF imagery + vector tree labels
 ```
 
 ---
+
 ## Dataset Types
 
 The repository uses several dataset organizations depending on the task.
@@ -368,6 +372,7 @@ PYTHONPATH=src python scripts/evaluate.py \
 ```
 
 ---
+
 ## Repository Structure
 
 ```text
@@ -489,11 +494,429 @@ PYTHONPATH=src python scripts/infer_geotiff.py \
 ```
 
 ---
-## Configuration Files
+
+# Configuration Files
 
 All major workflows are controlled through YAML files so that dataset paths, training settings, evaluation thresholds, and output locations can be changed without editing the Python source code.
 
 ---
+
+## 1. Dataset Preparation: `configs/dataset.yaml`
+
+Example:
+
+```yaml
+project:
+  name: GeoAI-UrbanTree-RFDETR
+
+dataset:
+  name: new_york_030
+  split_name: test
+
+input:
+  raster_dir: datasets/geotiff_rgbn/new_york_030
+  raster_pattern: "*.tif"
+  labels: datasets/labels/new_york_030/labels_new_york_030.shp
+
+processing:
+  tile_size: 256
+  bands:
+    - 1
+    - 2
+    - 3
+  min_bbox_area: 4.0
+  skip_empty: false
+  keep_partial: false
+
+output:
+  root: outputs/dataset_preparation/new_york_030
+  clean: false
+```
+
+### Parameters
+
+| Parameter | Meaning |
+|---|---|
+| `dataset.name` | Dataset identifier used in generated image filenames and metadata |
+| `dataset.split_name` | Output COCO split name, such as `train`, `valid`, or `test` |
+| `input.raster_dir` | Directory containing source GeoTIFF files |
+| `input.raster_pattern` | Glob pattern used to discover raster files |
+| `input.labels` | Vector label file used to create object-detection boxes |
+| `processing.tile_size` | Raster tile size in pixels |
+| `processing.bands` | Three 1-based raster bands exported as RGB |
+| `processing.min_bbox_area` | Minimum retained bounding-box area in pixels² |
+| `processing.skip_empty` | If `true`, patches with zero valid tree boxes are omitted |
+| `processing.keep_partial` | If `true`, smaller edge tiles are retained |
+| `output.root` | Output COCO dataset directory |
+| `output.clean` | If `true`, remove the existing output directory before preparation |
+
+The preparation workflow:
+
+```text
+GeoTIFF
+  ↓
+tile raster
+  ↓
+query intersecting vector labels
+  ↓
+clip geometry to tile
+  ↓
+convert map coordinates → pixel bbox
+  ↓
+filter small boxes
+  ↓
+save PNG
+  ↓
+write COCO JSON
+```
+
+Output:
+
+```text
+output.root/
+└── <split_name>/
+    ├── images/
+    ├── _annotations.coco.json
+    └── preparation_summary.json
+```
+
+---
+
+## 2. TVT Training: `configs/train.yaml`
+
+Example:
+
+```yaml
+project:
+  name: GeoAI-UrbanTree-RFDETR
+  experiment_name: tvt_baseline
+
+dataset:
+  type: tvt
+  root: datasets/coco/tvt
+  annotation_file: _annotations.coco.json
+  splits:
+    train: train
+    valid: valid
+    test: test
+
+model:
+  architecture: RFDETRBase
+  pretrained: true
+
+training:
+  epochs: 50
+  batch_size: 8
+  grad_accum_steps: 4
+  learning_rate: 0.0001
+  num_workers: 8
+  checkpoint_interval: 10
+  run_test_during_training: false
+
+output:
+  root: outputs/training/tvt
+  run_name: rfdetr_tvt_base
+
+system:
+  device: cuda
+  seed: 42
+```
+
+### Parameters
+
+| Parameter | Meaning |
+|---|---|
+| `project.name` | Repository / project name |
+| `project.experiment_name` | Human-readable experiment identifier |
+| `dataset.type` | Dataset workflow type; `tvt` for train/validation/test |
+| `dataset.root` | Root directory containing the COCO splits |
+| `dataset.annotation_file` | COCO annotation filename |
+| `dataset.splits.train` | Training split directory name |
+| `dataset.splits.valid` | Validation split directory name |
+| `dataset.splits.test` | Test split directory name |
+| `model.architecture` | RF-DETR architecture; current pipeline uses `RFDETRBase` |
+| `model.pretrained` | Records the intended pretrained-model setup in the experiment configuration |
+| `training.epochs` | Number of training epochs |
+| `training.batch_size` | Number of images per training batch |
+| `training.grad_accum_steps` | Number of gradient-accumulation steps |
+| `training.learning_rate` | Optimizer learning rate |
+| `training.num_workers` | Number of data-loader workers |
+| `training.checkpoint_interval` | Save a regular checkpoint every N epochs |
+| `training.run_test_during_training` | Whether RF-DETR evaluates the test split during training |
+| `output.root` | Root training-output directory |
+| `output.run_name` | Name of this training run |
+| `system.device` | Intended compute device recorded in the configuration |
+| `system.seed` | Experiment seed recorded for reproducibility |
+
+Training output is written to:
+
+```text
+outputs/training/tvt/rfdetr_tvt_base/
+```
+
+The standard public model checkpoint is:
+
+```text
+checkpoint_best_ema.pth
+```
+
+---
+
+## 3. Cross-Validation: `configs/cross_validation.yaml`
+
+Example:
+
+```yaml
+project:
+  name: GeoAI-UrbanTree-RFDETR
+  experiment_name: cv_baseline
+
+dataset:
+  type: cross_validation
+  root: datasets/coco/cv
+  annotation_file: _annotations.coco.json
+  fold_prefix: fold_
+  num_folds: 5
+  splits:
+    train: train
+    valid: valid
+
+model:
+  architecture: RFDETRBase
+  pretrained: true
+
+training:
+  epochs: 50
+  batch_size: 8
+  grad_accum_steps: 4
+  learning_rate: 0.0001
+  num_workers: 8
+  checkpoint_interval: 10
+  run_test_during_training: false
+
+output:
+  root: outputs/cross_validation
+  fold_prefix: fold_
+
+system:
+  device: cuda
+  seed: 42
+```
+
+### Parameters
+
+| Parameter | Meaning |
+|---|---|
+| `dataset.type` | Identifies the cross-validation workflow |
+| `dataset.root` | Root directory containing fold directories |
+| `dataset.annotation_file` | COCO annotation filename |
+| `dataset.fold_prefix` | Prefix used for fold directories |
+| `dataset.num_folds` | Number of cross-validation folds |
+| `dataset.splits.train` | Training split name within each fold |
+| `dataset.splits.valid` | Validation split name within each fold |
+| `output.root` | Root directory for all CV training outputs |
+| `output.fold_prefix` | Prefix used for CV output directories |
+
+The remaining `model`, `training`, and `system` parameters have the same meanings as in `configs/train.yaml`.
+
+Expected outputs:
+
+```text
+outputs/cross_validation/
+├── fold_1/
+├── fold_2/
+├── fold_3/
+├── fold_4/
+└── fold_5/
+```
+
+---
+
+## 4. Evaluation: `configs/evaluate.yaml`
+
+Example:
+
+```yaml
+project:
+  name: GeoAI-UrbanTree-RFDETR
+
+model:
+  architecture: RFDETRBase
+
+checkpoint:
+  tvt: weights/tvt/checkpoint_best_ema.pth
+  cv_root: weights/cv
+  cv_pattern: fold_{fold}/checkpoint_best_ema.pth
+
+evaluation:
+  coco_threshold: 0.001
+  prediction_threshold: 0.30
+  iou_threshold: 0.50
+  max_detections: 200
+  save_predictions: true
+  save_visualizations: true
+
+visualization:
+  ground_truth_color: lime
+  prediction_color: red
+  box_width: 2
+  panel_gap: 20
+
+datasets:
+  tvt:
+    root: datasets/coco/tvt
+    splits: [train, valid, test]
+
+  cv:
+    root: datasets/coco/cv
+    num_folds: 5
+    splits: [train, valid]
+
+  transfer:
+    root: datasets/coco/transfer
+    cities:
+      - new_york_030
+      - chicago_030
+      - dallas_060
+      - los_angeles_060
+    split: test
+
+output:
+  root: outputs/evaluation
+  tvt: outputs/evaluation/tvt
+  cv: outputs/evaluation/cv
+  transfer: outputs/evaluation/transfer
+```
+
+### Parameters
+
+| Parameter | Meaning |
+|---|---|
+| `checkpoint.tvt` | EMA checkpoint used for TVT and transfer evaluation |
+| `checkpoint.cv_root` | Root directory containing CV checkpoints |
+| `checkpoint.cv_pattern` | Fold-specific checkpoint path pattern |
+| `evaluation.coco_threshold` | Low confidence threshold used to retain detections for COCO AP / AR evaluation |
+| `evaluation.prediction_threshold` | Practical threshold used for precision, recall, F1, and visualization |
+| `evaluation.iou_threshold` | IoU threshold used for TP / FP / FN matching |
+| `evaluation.max_detections` | Maximum predictions retained per image |
+| `evaluation.save_predictions` | Save COCO-format model predictions |
+| `evaluation.save_visualizations` | Save ground-truth vs prediction images |
+| `visualization.ground_truth_color` | Ground-truth box color |
+| `visualization.prediction_color` | Prediction box color |
+| `visualization.box_width` | Bounding-box line width |
+| `visualization.panel_gap` | Pixel gap between GT and prediction panels |
+| `datasets.tvt.root` | TVT dataset root |
+| `datasets.tvt.splits` | TVT splits to evaluate |
+| `datasets.cv.root` | CV dataset root |
+| `datasets.cv.num_folds` | Number of CV folds |
+| `datasets.cv.splits` | CV splits to evaluate |
+| `datasets.transfer.root` | Transfer-city dataset root |
+| `datasets.transfer.cities` | Transfer datasets to evaluate |
+| `datasets.transfer.split` | Transfer split name |
+| `output.tvt` | TVT evaluation output directory |
+| `output.cv` | CV evaluation output directory |
+| `output.transfer` | Transfer evaluation output directory |
+
+### Metrics
+
+The evaluation pipeline calculates:
+
+```text
+COCO AP50:95
+AP50
+AP75
+AR@200
+
+Precision
+Recall
+F1
+
+TP
+FP
+FN
+```
+
+It also supports:
+
+```text
+per-image metrics CSV
+summary JSON
+summary TXT
+COCO prediction JSON
+GT / prediction visualizations
+combined summary CSV
+```
+
+---
+
+## 5. Large-Area Inference: `configs/inference.yaml`
+
+Example:
+
+```yaml
+project:
+  name: GeoAI-UrbanTree-RFDETR
+  inference_name: miami_full_aoi
+
+model:
+  architecture: RFDETRBase
+
+checkpoint:
+  path: weights/tvt/checkpoint_best_ema.pth
+
+input:
+  raster: datasets/geotiff_rgbn/miami_030/NAIP_2023_Miami_RGBN_CLIP.tif
+  bands: [1, 2, 3]
+
+inference:
+  tile_size: 256
+  confidence_threshold: 0.30
+  max_detections: 200
+  test_mode: false
+  max_test_tiles: 100
+  save_test_tiles: false
+
+output:
+  root: outputs/inference/miami_030/full_aoi
+  save_json: true
+  save_geojson: true
+  save_shapefile: true
+```
+
+### Parameters
+
+| Parameter | Meaning |
+|---|---|
+| `project.inference_name` | Human-readable inference run name |
+| `model.architecture` | RF-DETR model architecture |
+| `checkpoint.path` | Trained model checkpoint |
+| `input.raster` | Input GeoTIFF |
+| `input.bands` | Three 1-based raster bands used as RGB |
+| `inference.tile_size` | Inference tile size in pixels |
+| `inference.confidence_threshold` | Minimum confidence retained in final predictions |
+| `inference.max_detections` | Maximum predictions per tile |
+| `inference.test_mode` | Run only a small central subset of tiles |
+| `inference.max_test_tiles` | Maximum tiles processed when test mode is enabled |
+| `inference.save_test_tiles` | Save test-mode RGB tiles for inspection |
+| `output.root` | Output directory |
+| `output.save_json` | Save tabular prediction records as JSON |
+| `output.save_geojson` | Save geospatial predictions as GeoJSON |
+| `output.save_shapefile` | Save geospatial predictions as an ESRI Shapefile |
+
+Inference converts detections from:
+
+```text
+tile pixel coordinates
+        ↓
+full-raster pixel coordinates
+        ↓
+map coordinates
+        ↓
+geospatial polygons
+```
+
+---
+
 ## Using Your Own Dataset
 
 There are two main ways to use your own data.
@@ -564,6 +987,7 @@ PYTHONPATH=src python scripts/train.py \
 The shared trainer validates the required directory structure before training starts.
 
 ---
+
 ## Model Weights
 
 Released model weights use the EMA checkpoint:
@@ -594,6 +1018,7 @@ weights/
 Large model weights are not stored directly in the Git repository and can be distributed separately through Zenodo.
 
 ---
+
 ## Outputs
 
 ### Training
@@ -647,6 +1072,7 @@ summary.json
 ```
 
 ---
+
 ## Python Package
 
 Reusable functionality is implemented under:
@@ -746,6 +1172,7 @@ Responsibilities:
 - model-checkpoint resolution
 
 ---
+
 ## Citation
 
 If you use this repository in research, please cite the associated publication and software release.
@@ -759,6 +1186,7 @@ CITATION.cff
 The Zenodo DOI for archived software, datasets, and model weights can be added after the public archive is created.
 
 ---
+
 ## License
 
 This project is released under the MIT License.
