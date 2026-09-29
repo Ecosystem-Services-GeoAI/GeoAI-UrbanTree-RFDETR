@@ -72,6 +72,15 @@ An interactive web application is available for exploring the large-area urban-t
 <!--
 **[Launch the Miami Tree Canopy Explorer](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)**
 -->
+
+<p align="center">
+  <a href="https://es-geoai.rc.ufl.edu/agroes-miami-tree/">
+    <img src="assets/Miami_Tree_LOGO.png"
+         alt="Miami Tree Canopy Explorer"
+         width="50%">
+  </a>
+</p>
+
 [![Online System](https://img.shields.io/badge/Online%20System-Miami%20Tree%20Canopy%20Explorer-brightgreen)](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)
 
 The application provides an interactive geospatial interface for exploring RF-DETR tree detections across the Miami study area. Users can draw a polygon or rectangle over an area of interest to perform spatial analysis of detected trees and inspect bounding-box size distributions for tree canopy cover.
