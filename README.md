@@ -4,9 +4,24 @@ Reproducible RF-DETR pipeline for urban tree detection from high-resolution geos
 
 This repository supports the complete workflow from geospatial data preparation to model training, cross-validation, evaluation, transfer testing, and large-area GeoTIFF inference. It can be used either to reproduce the urban-tree experiments in this project or to train and evaluate RF-DETR on a user's own compatible dataset.
 
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![RF-DETR](https://img.shields.io/badge/RF--DETR-1.5.0rc1-purple)](https://github.com/roboflow/rf-detr)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.10-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Online System](https://img.shields.io/badge/Online%20System-Miami%20Tree%20Canopy%20Explorer-brightgreen)](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)
+[![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-Powered%20By-4285F4?logo=googleearth&logoColor=white)](https://earthengine.google.com/)
+
+<!--
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Model-yellow)](YOUR_HUGGINGFACE_URL)
+[![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![Preprint](https://img.shields.io/badge/Preprint-EcoEvoRxiv-darkgreen)](YOUR_PREPRINT_URL)
+-->
+
 ---
 ## Categories
 
+- [Overview](#overview)
+- [Online System](#online-system--miami-tree-canopy-explorer)
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Supported Workflows](#supported-workflows)
@@ -27,7 +42,6 @@ This repository supports the complete workflow from geospatial data preparation 
 - [License](#license)
 
 ---
-
 ## Overview
 
 The pipeline is designed around high-resolution geospatial imagery and object-detection labels for individual trees.
@@ -48,6 +62,28 @@ Main capabilities include:
 - export to JSON, GeoJSON, and Shapefile
 - YAML-based experiment configuration
 - reusable Python modules under `src/geoai_tree/`
+
+---
+## Online System — Miami Tree Canopy Explorer
+
+An interactive web application is available for exploring the large-area urban-tree detections produced by this workflow:
+
+<!--
+**[Launch the Miami Tree Canopy Explorer](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)**
+-->
+[![Online System](https://img.shields.io/badge/Online%20System-Miami%20Tree%20Canopy%20Explorer-brightgreen)](https://es-geoai.rc.ufl.edu/agroes-miami-tree/)
+
+The application provides an interactive geospatial interface for exploring RF-DETR tree detections across the Miami study area. Users can draw a polygon or rectangle over an area of interest to perform spatial analysis of detected trees and inspect bounding-box size distributions for tree canopy cover.
+
+The application connects the model inference outputs with an interactive Google Earth Engine interface, providing a practical demonstration of how large-area GeoAI predictions can be explored and analyzed beyond the command-line workflow.
+
+<p align="center">
+  <img src="assets/miami_tree_canopy_explorer.gif"
+       alt="Miami Tree Canopy Explorer demonstration"
+       width="100%">
+</p>
+
+> **Note:** The online system demonstrates the Miami tree-detection results generated from the project workflow. The reproducible training, evaluation, and large-area inference pipeline is provided in this repository.
 
 ---
 ## Quick Start
